@@ -1,32 +1,68 @@
-# Data Mesh Implementation
+# Data Mesh Architecture Implementation
 
-A modern data architecture implementation using data mesh principles, focusing on data quality, governance, and integration.
+A comprehensive implementation of a data mesh architecture with data quality, lineage tracking, and catalog management capabilities.
+
+## Overview
+
+This project implements a data mesh architecture that enables organizations to manage their data as a product. It provides services for data quality management, lineage tracking, and data catalog management, all following data mesh principles.
 
 ## Features
 
-- Data Quality Framework
-  - Quality rule engine
-  - Quality monitoring
-  - Quality reporting
-  - Prometheus metrics
-- REST API Service
-  - Quality rule management
-  - Quality checks
-  - Quality reports
-  - Health monitoring
+### Data Catalog Service
+- Product registration and versioning
+- Schema management
+- Quality rules and policies
+- Search and discovery
+- Lineage tracking
+- Domain-based organization
 
-## Prerequisites
+### Data Quality Service
+- Rule-based quality checks
+- Multiple check types (completeness, accuracy, consistency, timeliness)
+- Quality metrics and reporting
+- Check history tracking
+- Configurable severity levels
 
-- Python 3.9+
-- pip
-- virtualenv (recommended)
+### Data Lineage Service
+- Graph-based lineage tracking
+- Impact analysis
+- Upstream/downstream dependency tracking
+- Transformation tracking
+- Graph visualization support
 
-## Installation
+## Project Structure
+
+```
+data_mesh/
+├── api/
+│   └── catalog_service.py      # FastAPI service for catalog operations
+├── catalog/
+│   └── catalog.py             # Core catalog implementation
+├── quality/
+│   └── quality_service.py     # Data quality service implementation
+├── lineage/
+│   └── lineage_service.py     # Data lineage service implementation
+├── governance/
+│   └── policy_engine.py       # Policy enforcement engine
+└── tests/
+    ├── test_catalog_service.py
+    ├── test_quality_service.py
+    └── test_lineage_service.py
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- pip (Python package manager)
+
+### Installation
 
 1. Clone the repository:
 ```powershell
-git clone https://github.com/yourusername/data-mesh.git
-cd data-mesh
+git clone https://github.com/yourusername/data-architecture.git
+cd data-architecture
 ```
 
 2. Create and activate a virtual environment:
@@ -37,95 +73,150 @@ python -m venv venv
 
 3. Install dependencies:
 ```powershell
-pip install -e .
+pip install -r requirements.txt
 ```
 
-## Running the Service
+### Running Tests
 
-Start the data quality service:
+Run the test suite using pytest:
 ```powershell
-python -m data_mesh.main
+# Run all tests
+pytest
+
+# Run tests with coverage report
+pytest --cov=data_mesh
+
+# Run specific test file
+pytest tests/test_quality_service.py
+
+# Run tests with verbose output
+pytest -v
 ```
 
-The service will be available at http://localhost:8000
+### Running Services
+
+Start the services using uvicorn:
+```powershell
+# Start catalog service
+uvicorn data_mesh.api.catalog_service:app --reload
+
+# Start quality service
+uvicorn data_mesh.quality.quality_service:app --reload
+
+# Start lineage service
+uvicorn data_mesh.lineage.lineage_service:app --reload
+```
 
 ## API Documentation
 
-Once the service is running, you can access the API documentation at:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+### Catalog Service Endpoints
 
-### Example API Usage
+- `POST /products` - Register new data product
+- `PUT /products/{name}` - Update existing product
+- `GET /products/{name}` - Get product details
+- `GET /products` - List all products
+- `POST /products/{name}/versions` - Add new version
+- `GET /products/{name}/versions` - Get version history
+- `GET /search` - Search products
+- `GET /products/{name}/lineage` - Get lineage information
+- `GET /products/{name}/quality` - Get quality information
 
-1. Add a quality rule:
+### Quality Service Endpoints
+
+- `POST /rules` - Add quality rule
+- `DELETE /rules/{name}` - Remove quality rule
+- `POST /check` - Run quality checks
+- `GET /rules/{name}/history` - Get check history
+- `GET /metrics` - Get quality metrics
+
+### Lineage Service Endpoints
+
+- `POST /nodes` - Add node
+- `POST /edges` - Add edge
+- `GET /nodes/{node_id}` - Get node details
+- `GET /nodes/{node_id}/upstream` - Get upstream nodes
+- `GET /nodes/{node_id}/downstream` - Get downstream nodes
+- `GET /lineage/{source_id}/{target_id}` - Get lineage path
+- `GET /impact/{node_id}` - Get impact analysis
+- `GET /summary` - Get graph summary
+
+## Development
+
+### Adding New Features
+
+1. Create feature branch:
 ```powershell
-$rule = @{
-    name = "not_null_rule"
-    description = "Check for non-null values"
-    rule_type = "not_null"
-    parameters = @{}
-    severity = "high"
-} | ConvertTo-Json
-
-Invoke-RestMethod -Uri "http://localhost:8000/rules" -Method Post -Body $rule -ContentType "application/json"
+git checkout -b feature/your-feature-name
 ```
 
-2. Check data quality:
-```powershell
-$data = @{
-    data = @{
-        field1 = "test"
-        field2 = $null
-    }
-    domain = "test_domain"
-} | ConvertTo-Json
+2. Implement changes and add tests
+3. Run test suite
+4. Submit pull request
 
-Invoke-RestMethod -Uri "http://localhost:8000/check" -Method Post -Body $data -ContentType "application/json"
-```
+### Code Style
 
-3. Get quality report:
-```powershell
-Invoke-RestMethod -Uri "http://localhost:8000/report/test_domain" -Method Get
-```
+- Follow PEP 8 guidelines
+- Use type hints
+- Write docstrings for all functions and classes
+- Keep functions small and focused
 
-## Running Tests
+## Testing
 
-Run the test suite:
-```powershell
-pytest
-```
+The project includes comprehensive test coverage for all components:
 
-Run tests with coverage:
-```powershell
-pytest --cov=data_mesh
-```
+### Test Categories
 
-## Project Structure
+1. **Unit Tests**
+   - Individual component testing
+   - Mock dependencies
+   - Test edge cases
 
-```
-data-mesh/
-├── data_mesh/
-│   ├── api/
-│   │   └── quality_service.py
-│   │   
-│   ├── quality/
-│   │   ├── engine.py
-│   │   └── monitor.py
-│   └── main.py
-├── tests/
-│   └── test_quality.py
-├── pyproject.toml
-└── README.md
-```
+2. **Integration Tests**
+   - Component interaction testing
+   - End-to-end workflows
+   - API endpoint testing
+
+3. **Quality Tests**
+   - Rule validation
+   - Check execution
+   - Metrics calculation
+
+4. **Lineage Tests**
+   - Graph operations
+   - Path finding
+   - Impact analysis
+
+## Documentation
+
+Additional documentation is available in the `docs/` directory:
+
+- `docs/additional/data-quality-framework-implementation.md`
+- `docs/additional/data-mesh-migration-implementation.md`
+- `docs/additional/data-mesh-security.md`
+- `docs/additional/data-mesh-operations.md`
+- `docs/additional/data-mesh-testing.md`
+- `docs/additional/data-mesh-governance.md`
+- `docs/additional/data-mesh-integration.md`
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the maintainers.
+
+## Acknowledgments
+
+- Data Mesh Architecture principles
+- FastAPI framework
+- Pydantic for data validation
+- Pytest for testing framework 
