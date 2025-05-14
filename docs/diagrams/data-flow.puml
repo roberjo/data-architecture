@@ -1,0 +1,73 @@
+@startuml Data Flow
+
+skinparam backgroundColor white
+skinparam handwritten false
+
+title Wealth Management Data Architecture - Data Flow
+
+' Define components
+package "Source Systems" {
+    [Client Data] as Client
+    [Account Data] as Account
+    [Investment Data] as Investment
+    [Document Data] as Doc
+}
+
+package "Data Processing" {
+    [ETL Jobs] as ETL
+    [Data Validation] as Validation
+    [Data Transformation] as Transform
+}
+
+package "Data Storage" {
+    database "PostgreSQL Aurora" as Aurora
+    database "DynamoDB" as Dynamo
+    database "S3" as S3
+    database "Snowflake" as Snowflake
+}
+
+package "Data Access" {
+    [API Layer] as API
+    [Analytics] as Analytics
+    [Reporting] as Report
+}
+
+' Define data flows
+Client --> ETL
+Account --> ETL
+Investment --> ETL
+Doc --> ETL
+
+ETL --> Validation
+Validation --> Transform
+Transform --> Aurora
+Transform --> Dynamo
+Transform --> S3
+Transform --> Snowflake
+
+Aurora --> API
+Dynamo --> API
+S3 --> API
+Snowflake --> Analytics
+Snowflake --> Report
+
+' Add notes
+note right of ETL
+  Daily batch processing
+  Real-time streaming
+  Event-driven updates
+end note
+
+note right of Validation
+  Data quality checks
+  Business rule validation
+  Error handling
+end note
+
+note right of Transform
+  Data normalization
+  Enrichment
+  Aggregation
+end note
+
+@enduml 

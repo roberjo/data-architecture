@@ -1,0 +1,92 @@
+@startuml CI/CD Architecture
+
+skinparam backgroundColor white
+skinparam handwritten false
+
+title Wealth Management Data Architecture - CI/CD Architecture
+
+' Define components
+package "Source Control" {
+    [Git Repository] as Git
+    [Code Review] as Review
+    [Branch Management] as Branch
+}
+
+package "Build & Package" {
+    [Harness Pipeline] as Harness
+    [Build Jobs] as Build
+    [Test Jobs] as Test
+    [Package Jobs] as Package
+}
+
+package "Artifact Management" {
+    [JFrog Artifactory] as Artifactory {
+        [Build Artifacts] as BuildArtifacts
+        [NuGet Packages] as NuGet
+        [Docker Images] as Docker
+    }
+}
+
+package "Secrets Management" {
+    [HashiCorp Vault] as Vault {
+        [Credentials] as Creds
+        [Certificates] as Certs
+        [API Keys] as APIKeys
+        [Secrets] as Secrets
+    }
+}
+
+package "Deployment" {
+    [Harness Deploy] as Deploy
+    [Environment Promotion] as Promote
+    [Rollback] as Rollback
+}
+
+package "Monitoring" {
+    [Deployment Metrics] as Metrics
+    [Pipeline Analytics] as Analytics
+    [Security Scanning] as Security
+}
+
+' Define relationships
+Git --> Harness
+Review --> Harness
+Branch --> Harness
+
+Harness --> Build
+Build --> Test
+Test --> Package
+Package --> Artifactory
+
+Vault --> Harness
+Vault --> Build
+Vault --> Deploy
+
+Artifactory --> Deploy
+Deploy --> Promote
+Promote --> Rollback
+
+Deploy --> Metrics
+Harness --> Analytics
+Security --> Harness
+
+' Add notes
+note right of Harness
+  Pipeline as Code
+  Infrastructure as Code
+  Security as Code
+end note
+
+note right of Vault
+  Dynamic Secrets
+  Secret Rotation
+  Access Control
+end note
+
+note right of Artifactory
+  Version Control
+  Binary Management
+  Dependency Management
+end note
+
+@enduml 

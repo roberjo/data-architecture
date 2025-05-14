@@ -1,0 +1,71 @@
+@startuml High Level Architecture
+
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam backgroundColor white
+skinparam handwritten false
+
+title Wealth Management Data Architecture - High Level View
+
+' Define components
+package "Data Sources" {
+    [PostgreSQL Aurora v2] as Aurora
+    [DynamoDB] as Dynamo
+    [S3] as S3
+}
+
+package "Data Integration" {
+    [AWS Glue] as Glue
+    [AWS Lambda] as Lambda
+    [Step Functions] as Step
+    [API Gateway] as API
+    [Snowpipe] as Snowpipe
+}
+
+package "Data Warehouse" {
+    [Snowflake] as Snowflake
+}
+
+package "Security & Compliance" {
+    [AWS KMS] as KMS
+    [AWS Secrets Manager] as Secrets
+    [AWS WAF] as WAF
+    [AWS Shield] as Shield
+}
+
+package "Monitoring & Operations" {
+    [CloudWatch] as CloudWatch
+    [AWS X-Ray] as XRay
+    [AWS Config] as Config
+    [Systems Manager] as SSM
+}
+
+' Define relationships
+Aurora --> Glue
+Dynamo --> Glue
+S3 --> Glue
+Glue --> Snowflake
+Lambda --> Glue
+Step --> Glue
+API --> Lambda
+Snowpipe --> Snowflake
+
+' Security relationships
+KMS --> Aurora
+KMS --> Dynamo
+KMS --> S3
+Secrets --> Lambda
+WAF --> API
+Shield --> API
+
+' Monitoring relationships
+CloudWatch --> Aurora
+CloudWatch --> Dynamo
+CloudWatch --> Lambda
+XRay --> Lambda
+Config --> Aurora
+Config --> Dynamo
+SSM --> Lambda
+
+@enduml 

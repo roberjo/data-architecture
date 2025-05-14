@@ -1,0 +1,75 @@
+@startuml Security Architecture
+
+skinparam backgroundColor white
+skinparam handwritten false
+
+title Wealth Management Data Architecture - Security Architecture
+
+' Define components
+package "Network Security" {
+    [VPC] as VPC
+    [Security Groups] as SG
+    [Network ACLs] as NACL
+    [AWS WAF] as WAF
+    [AWS Shield] as Shield
+}
+
+package "Data Security" {
+    [AWS KMS] as KMS
+    [AWS Secrets Manager] as Secrets
+    [Encryption at Rest] as Encrypt
+    [Encryption in Transit] as Transit
+}
+
+package "Access Control" {
+    [IAM] as IAM
+    [AWS Lake Formation] as Lake
+    [Role-Based Access] as RBAC
+    [Multi-Factor Auth] as MFA
+}
+
+package "Monitoring & Compliance" {
+    [CloudWatch] as CloudWatch
+    [AWS Config] as Config
+    [CloudTrail] as Trail
+    [GuardDuty] as Guard
+}
+
+' Define relationships
+VPC --> SG
+VPC --> NACL
+WAF --> VPC
+Shield --> VPC
+
+KMS --> Encrypt
+Secrets --> Encrypt
+Encrypt --> Transit
+
+IAM --> RBAC
+Lake --> RBAC
+MFA --> IAM
+
+CloudWatch --> Config
+Config --> Trail
+Trail --> Guard
+
+' Add notes
+note right of VPC
+  Private subnets for databases
+  Public subnets for APIs
+  NAT Gateways for outbound
+end note
+
+note right of Encrypt
+  AES-256 encryption
+  TLS 1.3
+  Key rotation
+end note
+
+note right of RBAC
+  Least privilege
+  Role separation
+  Access reviews
+end note
+
+@enduml 
